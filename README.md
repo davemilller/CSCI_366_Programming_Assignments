@@ -1,3 +1,4 @@
+
 # CSCI 466 PA1 - Basic Battleship Game
 
 ## Instructions
@@ -124,6 +125,5 @@ Submit your work on D2L into the "Programming Assignment 1" folder.
 
 We will grade your submissions based on how many test cases in `tests.cpp` your solution passes.
 Note that for grading we will use out own `tests.cpp` and full size setup board files.
-
 
 
