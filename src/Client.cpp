@@ -34,6 +34,7 @@ void Client::initialize(unsigned int player, unsigned int board_size){
     std::ofstream file(fileName);
     cereal::JSONOutputArchive archive(file);
 
+    //action_board is a vector<vector<int>> and is initialized to board_size rows of 0's
     std::vector<int> line;
     line.assign(board_size, 0);
     std::vector<std::vector<int>> board;

@@ -47,7 +47,7 @@ void Server::initialize(unsigned int board_size,
     }
     this->board_size= board_size;
 
-
+    //file length should be board_size^2 + board_size to account for the extra newline
     if ((get_file_length(&this->p1_setup_board)) != (board_size * board_size + board_size)) {
         throw ServerException("Bad board size- p1");
     }
@@ -69,28 +69,6 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
         return OUT_OF_BOUNDS;
     }
 
-//    char board[board_size][board_size];
-//
-//    switch(player) {
-//        case 1:
-//            char c;
-//            for (int i= 0; p1_setup_board.get(c); i++) {
-//                for (int j= 0; j< board_size; j++) {
-//                    board[i][j]= c;
-//                }
-//            }
-//            break;
-//        case 2:
-//            char d;
-//            for (int i= 0; p2_setup_board.get(d); i++) {
-//                for (int j= 0; j< board_size; j++) {
-//                    board[i][j]= d;
-//                }
-//            }
-//            break;
-//    }
-
-//    char strike= board[x][y];
     char strike;
     switch(player) {
         case 1:
