@@ -16,31 +16,123 @@
 
 #include "common.hpp"
 #include "Client.hpp"
+#include <string>
+#include <sstream>
 
 Client::~Client() {
 }
 
 
 void Client::initialize(unsigned int player, unsigned int board_size){
+    this->player= player;
+    this->board_size= board_size;
+
+    //create player#.action_board.json
+    ostringstream os;
+    os << "player_" << player << ".action_board.json";
+    string fileName= os.str();
+    std::ofstream file(fileName);
+    cereal::JSONOutputArchive archive(file);
+
+    std::vector<int> line;
+    line.assign(board_size, 0);
+    std::vector<std::vector<int>> board;
+    board.assign(board_size, line);
+
+    archive(CEREAL_NVP(board));
+
+
+    this->initialized= true;
 }
 
 
 void Client::fire(unsigned int x, unsigned int y) {
+    ostringstream os;
+    os << "player_" << player << ".shot.json";
+    string fileName= os.str();
+    std::ofstream file(fileName);
+    cereal::JSONOutputArchive archive(file);
+    archive(CEREAL_NVP(x), CEREAL_NVP(y));
 }
 
 
 bool Client::result_available() {
+    ostringstream os;
+    os << "player_" << player << ".result.json";
+    string fileName= os.str();
+    std::ifstream shot(fileName);
+    if (!shot) {
+        return false;
+    }
+    else {
+        return true;
+    }
 }
 
 
 int Client::get_result() {
+    if (result_available()) {
+        ostringstream os;
+        os << "player_" << player << ".result.json";
+        string fileName = os.str();
+        std::ifstream shot(fileName);
+
+        cereal::JSONInputArchive ar(shot);
+        int result;
+        ar(result);
+
+        remove(const_cast<char*>(("player_" + to_string(player) + ".result.json").c_str()));
+
+        switch(result) {
+            case HIT:
+                return HIT;
+            case MISS:
+                return MISS;
+            case OUT_OF_BOUNDS:
+                return OUT_OF_BOUNDS;
+            default:
+                throw ClientException("Bad result");
+        }
+    }
 }
 
 
 
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
+    ostringstream os;
+    os << "player_" << player << ".action_board.json";
+    string fileName= os.str();
+    std::ifstream file(fileName);
+    cereal::JSONInputArchive ar(file);
+
+    std::vector<std::vector<int>> board;
+    ar(board);
+
+    board[x][y]= result;
+
+    std::ofstream outFile(fileName);
+    cereal::JSONOutputArchive archive(outFile);
+    archive(CEREAL_NVP(board));
 }
 
 
 string Client::render_action_board(){
+    ostringstream os;
+    os << "player_" << player << ".action_board.json";
+    string fileName= os.str();
+    std::ifstream file(fileName);
+    cereal::JSONInputArchive ar(file);
+
+    std::vector<std::vector<int>> board;
+    ar(board);
+
+    ostringstream out;
+    out << " ";
+    for (int i= 0; i< board_size; i++) {
+        for (int j= 0; j< board_size; j++) {
+            out << board[j][i] << " ";
+        }
+        out << "\n ";
+    }
+    return out.str();
 }
