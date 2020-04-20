@@ -25,13 +25,13 @@
  * @param file - the file whose length we want to query
  * @return length of the file in bytes
  */
-int get_file_length(std::ifstream *file){
+int get_file_length(std::ifstream file){
     if (!file) {
         return -1;
     }
 
-    file->seekg(0, std::ios::end);
-    int len= file->tellg();
+    file.seekg(0, std::ios::end);
+    int len= file.tellg();
     return len;
 }
 
@@ -40,18 +40,18 @@ void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
 
-    this->p1_setup_board= std::ifstream (p1_setup_board);
-    this->p2_setup_board= std::ifstream (p2_setup_board);
+    this->p1_setup_board= scan_setup_board(p1_setup_board);
+    this->p2_setup_board= scan_setup_board(p2_setup_board);
     if (!this->p1_setup_board || !this->p2_setup_board) {
         throw ServerException("File(s) not found");
     }
     this->board_size= board_size;
 
     //file length should be board_size^2 + board_size to account for the extra newline
-    if ((get_file_length(&this->p1_setup_board)) != (board_size * board_size + board_size)) {
+    if ((get_file_length(std::ifstream(p1_setup_board))) != (board_size * board_size + board_size)) {
         throw ServerException("Bad board size- p1");
     }
-    if (get_file_length(&this->p2_setup_board) != (board_size * board_size + board_size)) {
+    if (get_file_length(std::ifstream(p2_setup_board)) != (board_size * board_size + board_size)) {
         throw ServerException("Bad board size- p2");
     }
 
@@ -63,6 +63,25 @@ Server::~Server() {
 
 
 BitArray2D *Server::scan_setup_board(string setup_board_name){
+    BitArray2D *bitBoard = new BitArray2D(board_size, board_size);
+
+//    std::ifstream board(setup_board_name);
+//    char c;
+//
+//    for (int i= 0; i< board_size; i++) {
+//        for (int j= 0; j< board_size; j++) {
+//            board.seekg(i * (board_size + 1) + j, ios::beg);
+//            board.get(c);
+//
+//            bool hit= c == 'C' || c == 'B' || c == 'R' || c == 'S' || c == 'D';
+//
+//            if (hit) {
+//                bitBoard->set(i, j);
+//                cout << "set at " << i << j;
+//            }
+//        }
+//    }
+    return bitBoard;
 }
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
@@ -76,23 +95,17 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
         return OUT_OF_BOUNDS;
     }
 
-    char strike;
+    bool strike;
     switch(player) {
         case 1:
-            //[0,1] and [1,0] are different positions so seekg(x+y) would not work, therefore
-            //seekg((y* (board_size+1)) + x) moves the position down y and over x
-            //i.e. y*(board_size+1) skips y lines including the newline character at the end of each line
-            p2_setup_board.seekg((y* (board_size+1)) + x);
-            p2_setup_board.get(strike);
+            strike = p2_setup_board->get(x, y);
             break;
         case 2:
-            p1_setup_board.seekg((y* (board_size+1)) + x);
-            p1_setup_board.get(strike);
+            strike = p1_setup_board->get(x, y);
             break;
     }
 
-    bool hit= strike == 'C' || strike == 'B' || strike == 'R' || strike == 'S' || strike == 'D';
-    if (hit) {
+    if (strike) {
         return HIT;
     }
     else {
