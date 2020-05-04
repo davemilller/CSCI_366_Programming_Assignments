@@ -42,6 +42,7 @@ bool BitArray2D::get(unsigned int row, unsigned int column){
    if (column < 0 || column >= columns) {
        throw BitArray2DException("Column out of bounds");
    }
+   // check array bounds
 
    // get the element
    return get_bit_elem(array, columns, row, column);

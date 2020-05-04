@@ -18,6 +18,8 @@
 #include "common.hpp"
 #include "Server.hpp"
 
+#include <cstdio>
+#include <cstring>
 
 /**
  * Calculate the length of a file (helper function)
@@ -37,6 +39,7 @@ int get_file_length(std::ifstream file){
 
 
 void Server::initialize(unsigned int board_size,
+                        ConnectionSocket *socket,
                         string p1_setup_board,
                         string p2_setup_board){
 
@@ -142,4 +145,11 @@ int Server::process_shot(unsigned int player) {
     remove(const_cast<char*>(("player_" + to_string(player) + ".shot.json").c_str()));
 
     return SHOT_FILE_PROCESSED;
+
+bool Server::shot_available(){
+   return socket->data_available();
+}
+void Server::process_shot(sem_t *player_sem) {
+
+
 }

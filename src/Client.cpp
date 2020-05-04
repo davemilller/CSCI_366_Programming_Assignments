@@ -19,6 +19,10 @@
 #include <string>
 #include <sstream>
 
+#include <cstdio>
+#include <string>
+
+
 Client::~Client() {
 }
 
@@ -44,6 +48,9 @@ void Client::initialize(unsigned int player, unsigned int board_size){
 
 
     this->initialized= true;
+
+void Client::initialize(unsigned int player, ConnectionSocket *socket, unsigned int board_size){
+
 }
 
 

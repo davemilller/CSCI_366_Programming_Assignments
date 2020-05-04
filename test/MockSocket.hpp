@@ -14,16 +14,21 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef BATTLESHIP_COMMON_H
-#define BATTLESHIP_COMMON_H
+#ifndef BATTLESHIP_MOCKSOCKET_HPP
+#define BATTLESHIP_MOCKSOCKET_HPP
 
-#define MAX_PLAYERS 2
-#define HIT 1
-#define MISS -1
-#define OUT_OF_BOUNDS 0
 
-#define BOARD_SIZE 10
+#include "gmock/gmock.h"
 
-#define SERVER_PORT 8080
+#include "Socket.hpp"
 
-#endif //BATTLESHIP_COMMON_H
+class MockConnectionSocket : public ConnectionSocket {
+public:
+   MockConnectionSocket(unsigned int socket) : ConnectionSocket(socket) {};
+
+   MOCK_METHOD(void, send, (string msg), (override));
+   MOCK_METHOD(bool, data_available, (), (override));
+   MOCK_METHOD(istringstream *, receive, (), (override));
+};
+
+#endif //BATTLESHIP_MOCKSOCKET_HPP
